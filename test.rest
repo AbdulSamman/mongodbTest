@@ -1,0 +1,12 @@
+@url= http://localhost:6501
+
+### BASE
+{{url}}
+
+
+### GET Employees
+{{url}}/employees
+
+
+### GET Employee with ID
+{{url}}/employees/63c413bece003d083deefd13
