@@ -2,7 +2,7 @@ import { Employee } from "./models/Employee.js";
 import { IEmployee } from "./interfaces.js";
 
 export const getEmployees = () => {
-  return new Promise<IEmployee[] | {}>(async (resolve, reject) => {
+  return new Promise<IEmployee[]>(async (resolve, reject) => {
     try {
       const employees: IEmployee[] = await Employee.find().select(
         "firstName lastName title notes"
@@ -16,7 +16,10 @@ export const getEmployees = () => {
         });
       }
     } catch (error) {
-      reject(error);
+      reject({
+        status: "error",
+        message: error.message,
+      });
     }
   });
 };
@@ -25,7 +28,14 @@ export const getEmployee = (id: string) => {
   return new Promise<IEmployee[]>(async (resolve, reject) => {
     try {
       const employee: IEmployee[] = await Employee.findOne({ _id: id });
-      resolve(employee);
+      if (!employee) {
+        reject({
+          status: "error",
+          message: `item with id "${id}" could not found or delete`,
+        });
+      } else {
+        resolve(employee);
+      }
     } catch (error) {
       reject({
         status: "error",
@@ -38,8 +48,9 @@ export const getEmployee = (id: string) => {
 export const addEmployee = (employeeData: IEmployee) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const employee = new Employee(employeeData);
-      const addedEmployee = await employee.save();
+      //   const employee = new Employee(employeeData);
+      //   const addedEmployee = await employee.save();
+      const addedEmployee = await Employee.create(employeeData);
       resolve({
         status: "success",
         newId: addedEmployee._id,
@@ -57,11 +68,18 @@ export const deleteEmployee = (id: string) => {
   return new Promise(async (resolve, reject) => {
     try {
       const deleteOne = await Employee.deleteOne({ _id: id });
-      resolve({
-        status: "success",
-        news: deleteOne,
-        message: `${id} has been deleted`,
-      });
+      if (deleteOne.deletedCount === 1) {
+        resolve({
+          status: "success",
+          news: deleteOne,
+          message: `${id} has been deleted`,
+        });
+      } else {
+        reject({
+          status: "error",
+          message: `item with id "${id}" could not found or delete`,
+        });
+      }
     } catch (error) {
       reject({
         status: "error",
@@ -74,13 +92,28 @@ export const deleteEmployee = (id: string) => {
 export const editEmployee = (id: string, employee: IEmployee) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const oldEmployee = await Employee.find({ _id: id });
       const editOne = await Employee.updateOne(
         { _id: id },
         { $set: { ...employee } }
       );
+      const newEmployee = await Employee.find({ _id: id });
+      if (oldEmployee.length === 0) {
+        resolve({
+          status: "error",
+          message: `employee with id "${id}" not found`,
+        });
+      }
       resolve({
         status: "success",
-        message: `${editOne} has been updated`,
+        news: {
+          editOne,
+        },
+        updated: {
+          from: oldEmployee,
+          to: newEmployee,
+        },
+        message: `${id} has been updated`,
       });
     } catch (error) {
       reject({

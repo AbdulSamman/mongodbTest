@@ -2,14 +2,17 @@ import express from "express";
 import * as model from "./model.js";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
 import { IEmployee } from "./interfaces.js";
+import { error404, sendErrorTiClient } from "./models/404.js";
+import dotenv from "dotenv";
 dotenv.config();
 
 const port = process.env.PORT;
 const app = express();
 app.use(cors());
 app.use(express.json());
+// route error, 404
+app.use(error404, sendErrorTiClient);
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.MONGO_CONNECT);
 
