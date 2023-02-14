@@ -8,5 +8,32 @@
 {{url}}/employees
 
 
+
+### ADD EMPLOYEE
+POST {{url}}/employee
+content-type: application/json
+
+{
+	"lastName": "Addington222",
+	"firstName": "Aubrey",
+	"title": "Sales Representative",
+	"notes": "Author is a test employee that we are adding."
+}
+
+
 ### GET Employee with ID
-{{url}}/employees/63c413bece003d083deefd13
+{{url}}/employee/63ebddfd623966c027d86fa0
+
+### DELETE Employee with ID
+DELETE {{url}}/employee/63e42bf0688d4bc1afddbe71
+
+### EDIT EMPLOYEE
+PATCH {{url}}/employee/63ebddfd623966c027d86fa0
+content-type: application/json
+
+{
+	"lastName": "Addington555",
+	"firstName": "Aubreyasdasd",
+	"title": "Sales Representative",
+	"notes": "Author is a test employee that we are adding."
+}

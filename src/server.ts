@@ -3,11 +3,13 @@ import * as model from "./model.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import { IEmployee } from "./interfaces.js";
 dotenv.config();
 
 const port = process.env.PORT;
 const app = express();
 app.use(cors());
+app.use(express.json());
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.MONGO_CONNECT);
 
@@ -19,18 +21,56 @@ app.get("/employees", async (req: express.Request, res: express.Response) => {
   try {
     res.status(200).json(await model.getEmployees());
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send(error.message);
   }
 });
 
 app.get(
-  "/employees/:id",
+  "/employee/:id",
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const id: string = req.params.id;
+      res.status(200).json(await model.getEmployee(id));
+    } catch (error) {
+      res.status(500).send(error.message);
+    }
+  }
+);
+
+app.post("/employee", async (req: express.Request, res: express.Response) => {
+  try {
+    const employee: IEmployee = req.body;
+    console.log(employee);
+
+    const result = await model.addEmployee(employee);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+app.delete(
+  "/employee/:id",
   async (req: express.Request, res: express.Response) => {
     try {
       const id = req.params.id;
-      res.status(200).json(await model.getEmployee(id));
+
+      res.status(200).json(await model.deleteEmployee(id));
     } catch (error) {
-      res.status(500).send(error);
+      res.status(500).send(error.message);
+    }
+  }
+);
+
+app.patch(
+  "/employee/:id",
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const id = req.params.id;
+      const employee: IEmployee = req.body;
+      res.status(200).json(await model.editEmployee(id, employee));
+    } catch (error) {
+      res.status(500).send(error.message);
     }
   }
 );
