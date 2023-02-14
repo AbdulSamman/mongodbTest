@@ -11,8 +11,7 @@ const port = process.env.PORT;
 const app = express();
 app.use(cors());
 app.use(express.json());
-// route error, 404
-app.use(error404, sendErrorTiClient);
+
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.MONGO_CONNECT);
 
@@ -77,7 +76,8 @@ app.patch(
     }
   }
 );
-
+// route error, 404
+app.use(error404, sendErrorTiClient);
 app.listen(port, () => {
   console.log(`server running on http://localhost:${port}`);
 });
